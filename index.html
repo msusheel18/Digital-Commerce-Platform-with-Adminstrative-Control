@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DCPAC — Digital Commerce Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="dcpac-styles.css"/>
+</head>
+<body>
+
+<!-- Noise overlay -->
+<div class="noise-overlay"></div>
+
+<!-- Cursor -->
+<div class="cur" id="cur"></div>
+<div class="cur-trail" id="curTrail"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ████ HEADER ████ -->
+<header class="hdr" id="hdr">
+  <div class="hdr-inner">
+    <a class="hdr-logo" href="#" onclick="P('home');return false">
+      <div class="logo-mark">DC</div>
+      <div class="logo-text-wrap">
+        <span class="logo-full">DCPAC</span>
+        <span class="logo-sub">Digital Commerce</span>
+      </div>
+    </a>
+
+    <div class="hdr-search">
+      <select class="hdr-cat-sel" id="hdrCatSel">
+        <option value="">ALL</option>
+        <option>Electronics</option><option>Fashion</option>
+        <option>Home</option><option>Sports</option>
+        <option>Beauty</option><option>Books</option>
+        <option>Toys</option><option>Grocery</option>
+      </select>
+      <div class="hdr-search-divider"></div>
+      <input class="hdr-search-input" id="searchInput" type="text" placeholder="search the void…" autocomplete="off"/>
+      <button class="hdr-search-btn" onclick="doSearch()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <div class="search-dropdown" id="searchDrop"></div>
+    </div>
+
+    <div class="hdr-nav">
+      <button class="hdr-nav-btn" onclick="handleAcct()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="acctLabel">Sign In</span>
+      </button>
+      <button class="hdr-nav-btn" onclick="P('orders')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        <span>Orders</span>
+      </button>
+      <button class="hdr-cart-btn" onclick="P('cart')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-ct" id="cartCt">0</span>
+      </button>
+      <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMob()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Nav strip -->
+  <div class="nav-strip">
+    <div class="nav-strip-inner">
+      <button class="ns-btn" onclick="C('')">/ ALL PRODUCTS</button>
+      <button class="ns-btn" onclick="C('Electronics')">ELECTRONICS</button>
+      <button class="ns-btn" onclick="C('Fashion')">FASHION</button>
+      <button class="ns-btn" onclick="C('Home')">HOME</button>
+      <button class="ns-btn" onclick="C('Sports')">SPORTS</button>
+      <button class="ns-btn" onclick="C('Beauty')">BEAUTY</button>
+      <button class="ns-btn" onclick="C('Books')">BOOKS</button>
+      <button class="ns-btn" onclick="C('Toys')">TOYS</button>
+      <button class="ns-btn" onclick="C('Grocery')">GROCERY</button>
+      <button class="ns-btn ns-hot" onclick="P('deals')">⚡ DEALS</button>
+      <button class="ns-btn" onclick="P('tracking')">TRACK ORDER</button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile drawer -->
+<div class="mob-backdrop" id="mobBackdrop" onclick="closeMob()"></div>
+<div class="mob-drawer" id="mobDrawer">
+  <button class="mob-close" onclick="closeMob()">✕</button>
+  <div class="mob-links">
+    <button onclick="C('');closeMob()">All Products</button>
+    <button onclick="C('Electronics');closeMob()">Electronics</button>
+    <button onclick="C('Fashion');closeMob()">Fashion</button>
+    <button onclick="C('Home');closeMob()">Home & Living</button>
+    <button onclick="C('Sports');closeMob()">Sports</button>
+    <button onclick="C('Beauty');closeMob()">Beauty</button>
+    <button onclick="C('Books');closeMob()">Books</button>
+    <button onclick="P('deals');closeMob()">⚡ Deals</button>
+    <button onclick="P('tracking');closeMob()">Track Order</button>
+    <button onclick="handleAcct();closeMob()" id="mobAuthBtn">Sign In</button>
+  </div>
+</div>
+
+<!-- ████ PAGE: HOME ████ -->
+<main id="pg-home" class="page active">
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <canvas id="particleCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span class="tag-dot"></span>
+        <span class="tag-mono">DCPAC v2.0 // LIVE</span>
+      </div>
+      <h1 class="hero-h1">
+        <span class="h1-line" id="hl1">SHOP</span>
+        <span class="h1-line h1-outline" id="hl2">THE</span>
+        <span class="h1-line h1-accent" id="hl3">FUTURE.</span>
+      </h1>
+      <p class="hero-p" id="heroP">Premium digital commerce. Dark luxury. Zero compromise.<br>45+ curated products across 8 elite categories.</p>
+      <div class="hero-actions" id="heroActions">
+        <button class="btn-primary" onclick="C('')">EXPLORE COLLECTION</button>
+        <button class="btn-ghost" onclick="P('deals')">VIEW DEALS →</button>
+      </div>
+      <div class="hero-stats" id="heroStats">
+        <div class="stat"><span class="stat-n">45+</span><span class="stat-l">Products</span></div>
+        <div class="stat-sep">|</div>
+        <div class="stat"><span class="stat-n">8</span><span class="stat-l">Categories</span></div>
+        <div class="stat-sep">|</div>
+        <div class="stat"><span class="stat-n">70%</span><span class="stat-l">Max Off</span></div>
+        <div class="stat-sep">|</div>
+        <div class="stat"><span class="stat-n">24/7</span><span class="stat-l">Support</span></div>
+      </div>
+    </div>
+    <div class="hero-product-reel" id="heroReel">
+      <!-- injected by JS -->
+    </div>
+    <div class="hero-scroll-hint">
+      <span>scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <!-- CATEGORY GRID -->
+  <section class="section-wrap">
+    <div class="section-label">
+      <span class="sl-line"></span>
+      <span class="sl-mono">01 / CATEGORIES</span>
+    </div>
+    <h2 class="section-title">BROWSE BY <span class="acc">CATEGORY</span></h2>
+    <div class="cat-grid" id="catGrid"></div>
+  </section>
+
+  <!-- TRENDING -->
+  <section class="section-wrap alt-section">
+    <div class="section-label">
+      <span class="sl-line"></span>
+      <span class="sl-mono">02 / TRENDING</span>
+    </div>
+    <div class="section-head-row">
+      <h2 class="section-title">TRENDING <span class="acc">NOW</span></h2>
+      <button class="see-all-btn" onclick="C('')">SEE ALL →</button>
+    </div>
+    <div class="prod-grid" id="trendGrid"></div>
+  </section>
+
+  <!-- DEALS BENTO -->
+  <section class="section-wrap">
+    <div class="section-label">
+      <span class="sl-line"></span>
+      <span class="sl-mono">03 / HOT DEALS</span>
+    </div>
+    <div class="section-head-row">
+      <h2 class="section-title">FLASH <span class="acc">DEALS</span></h2>
+      <button class="see-all-btn" onclick="P('deals')">VIEW ALL →</button>
+    </div>
+    <div class="deals-bento" id="dealsBento"></div>
+  </section>
+
+  <!-- ELECTRONICS -->
+  <section class="section-wrap alt-section">
+    <div class="section-label">
+      <span class="sl-line"></span>
+      <span class="sl-mono">04 / ELECTRONICS</span>
+    </div>
+    <div class="section-head-row">
+      <h2 class="section-title">TECH <span class="acc">DROPS</span></h2>
+      <button class="see-all-btn" onclick="C('Electronics')">SEE ALL →</button>
+    </div>
+    <div class="prod-grid" id="elecGrid"></div>
+  </section>
+
+  <!-- FASHION -->
+  <section class="section-wrap">
+    <div class="section-label">
+      <span class="sl-line"></span>
+      <span class="sl-mono">05 / FASHION</span>
+    </div>
+    <div class="section-head-row">
+      <h2 class="section-title">STYLE <span class="acc">EDIT</span></h2>
+      <button class="see-all-btn" onclick="C('Fashion')">SEE ALL →</button>
+    </div>
+    <div class="prod-grid" id="fashGrid"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="ft-brand">
+        <div class="ft-logo">
+          <div class="logo-mark sm">DC</div>
+          <span>DCPAC</span>
+        </div>
+        <p>Digital Commerce Platform with Administrative Control. Built for the future of shopping.</p>
+        <p class="ft-credit">Project: M Susheel Rao · Sec 11 · Roll 2520080064</p>
+      </div>
+      <div class="ft-links-grid">
+        <div class="ftl-col"><h5>Platform</h5>
+          <a href="#" onclick="P('home');return false">Home</a>
+          <a href="#" onclick="C('');return false">Products</a>
+          <a href="#" onclick="P('deals');return false">Deals</a>
+          <a href="#" onclick="P('tracking');return false">Track Order</a>
+        </div>
+        <div class="ftl-col"><h5>Account</h5>
+          <a href="#" onclick="handleAcct();return false">Sign In</a>
+          <a href="#" onclick="P('orders');return false">My Orders</a>
+          <a href="#">Wishlist</a>
+        </div>
+        <div class="ftl-col"><h5>Support</h5>
+          <a href="#">Help Centre</a>
+          <a href="#">Returns</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <span class="mono-txt">© 2025 DCPAC DIGITAL COMMERCE PLATFORM WITH ADMINISTRATIVE CONTROL</span>
+      <span class="mono-txt">ALL SYSTEMS OPERATIONAL ●</span>
+    </div>
+  </footer>
+</main>
+
+<!-- ████ PAGE: PRODUCTS ████ -->
+<main id="pg-products" class="page">
+  <div class="products-layout">
+    <aside class="filter-sidebar" id="filterSidebar">
+      <div class="fsb-hdr">
+        <span class="mono-txt">FILTERS</span>
+        <button onclick="resetFilters()">RESET</button>
+      </div>
+      <div class="fsb-block">
+        <h4>Category</h4>
+        <div id="fsbCats"></div>
+      </div>
+      <div class="fsb-block">
+        <h4>Price Ceiling</h4>
+        <input type="range" id="priceSlider" min="0" max="250000" value="250000" oninput="onSlide(this.value)"/>
+        <div class="slider-labels">
+          <span>₹0</span>
+          <span class="acc" id="slideVal">₹2,50,000</span>
+        </div>
+      </div>
+      <div class="fsb-block">
+        <h4>Min Rating</h4>
+        <div class="radio-group">
+          <label><input type="radio" name="rF" value="0" checked onchange="applyF()"/> All</label>
+          <label><input type="radio" name="rF" value="4" onchange="applyF()"/> 4★+</label>
+          <label><input type="radio" name="rF" value="4.5" onchange="applyF()"/> 4.5★+</label>
+        </div>
+      </div>
+      <div class="fsb-block">
+        <h4>Discount</h4>
+        <div class="radio-group">
+          <label><input type="radio" name="dF" value="0" checked onchange="applyF()"/> Any</label>
+          <label><input type="radio" name="dF" value="20" onchange="applyF()"/> 20%+</label>
+          <label><input type="radio" name="dF" value="40" onchange="applyF()"/> 40%+</label>
+        </div>
+      </div>
+    </aside>
+    <div class="products-main">
+      <div class="prods-bar">
+        <div class="prods-bar-left">
+          <h2 id="prodPageTitle">ALL PRODUCTS</h2>
+          <span id="prodCount" class="mono-txt"></span>
+        </div>
+        <div class="prods-bar-right">
+          <select id="sortSel" onchange="applyF()">
+            <option value="">SORT: FEATURED</option>
+            <option value="pLo">PRICE ↑</option>
+            <option value="pHi">PRICE ↓</option>
+            <option value="rat">RATING</option>
+            <option value="dis">DISCOUNT</option>
+          </select>
+          <button class="filter-mob-toggle" onclick="toggleFilterSidebar()">⚙ FILTER</button>
+        </div>
+      </div>
+      <div class="prod-grid" id="prodGrid"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ████ PAGE: DETAIL ████ -->
+<main id="pg-detail" class="page">
+  <div class="detail-wrap">
+    <button class="back-pill" onclick="goBack()">← BACK</button>
+    <div id="detailMount"></div>
+  </div>
+</main>
+
+<!-- ████ PAGE: CART ████ -->
+<main id="pg-cart" class="page">
+  <div class="page-inner">
+    <div class="page-hdr">
+      <h1>YOUR <span class="acc">CART</span></h1>
+    </div>
+    <div class="cart-grid">
+      <div id="cartMount"></div>
+      <div class="cart-panel">
+        <div class="cp-hdr"><span class="mono-txt">ORDER SUMMARY</span></div>
+        <div id="cartSum"></div>
+        <div class="coupon-row">
+          <input type="text" id="couponIn" placeholder="PROMO CODE"/>
+          <button onclick="useCoupon()">APPLY</button>
+        </div>
+        <p id="couponMsg" class="coupon-msg"></p>
+        <button class="btn-primary full-btn" onclick="goCheckout()">CHECKOUT →</button>
+        <p class="secure-note">🔒 SSL Secured · Encrypted Payment</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ████ PAGE: PAYMENT ████ -->
+<main id="pg-payment" class="page">
+  <div class="page-inner">
+    <div class="page-hdr">
+      <h1>SECURE <span class="acc">CHECKOUT</span></h1>
+    </div>
+    <div class="pay-grid">
+      <div class="pay-left-col">
+        <!-- Address -->
+        <div class="pay-block">
+          <div class="pay-block-hdr"><span class="pay-num">01</span><h3>DELIVERY ADDRESS</h3></div>
+          <div class="form-grid">
+            <div class="fg"><label>FULL NAME *</label><input type="text" id="pName" placeholder="Your full name"/></div>
+            <div class="fg"><label>PHONE *</label><input type="text" id="pPhone" maxlength="13" placeholder="+91 XXXXXXXXXX"/></div>
+            <div class="fg span2"><label>ADDRESS *</label><input type="text" id="pAddr" placeholder="House, Street, Area"/></div>
+            <div class="fg span2"><label>LANDMARK</label><input type="text" id="pLand" placeholder="Landmark (optional)"/></div>
+            <div class="fg"><label>CITY *</label><input type="text" id="pCity" placeholder="City"/></div>
+            <div class="fg"><label>PINCODE *</label><input type="text" id="pPin" maxlength="6" placeholder="6-digit"/></div>
+            <div class="fg"><label>STATE</label>
+              <select id="pState">
+                <option>Telangana</option><option>Andhra Pradesh</option>
+                <option>Maharashtra</option><option>Karnataka</option>
+                <option>Tamil Nadu</option><option>Delhi</option>
+                <option>Gujarat</option><option>Rajasthan</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- Payment -->
+        <div class="pay-block">
+          <div class="pay-block-hdr"><span class="pay-num">02</span><h3>PAYMENT METHOD</h3></div>
+          <div class="pay-method-grid">
+            <label class="pm-lbl"><input type="radio" name="pm" value="card" checked onchange="switchPM()"/><span>💳 CARD</span></label>
+            <label class="pm-lbl"><input type="radio" name="pm" value="upi" onchange="switchPM()"/><span>📱 UPI</span></label>
+            <label class="pm-lbl"><input type="radio" name="pm" value="net" onchange="switchPM()"/><span>🏦 NET BANKING</span></label>
+            <label class="pm-lbl"><input type="radio" name="pm" value="cod" onchange="switchPM()"/><span>💵 CASH ON DELIVERY</span></label>
+          </div>
+          <!-- Card UI -->
+          <div id="pmCard">
+            <div class="card-visual">
+              <div class="cv-brand">DCPAC PAY</div>
+              <div class="cv-chip">⬛⬛⬛</div>
+              <div class="cv-num" id="cvNum">•••• •••• •••• ••••</div>
+              <div class="cv-foot">
+                <span id="cvName">CARDHOLDER NAME</span>
+                <span id="cvExp">MM / YY</span>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="fg span2"><label>CARD NUMBER</label><input type="text" id="cardNum" maxlength="19" placeholder="1234 5678 9012 3456" oninput="fmtCard(this)"/></div>
+              <div class="fg"><label>NAME ON CARD</label><input type="text" id="cardName" placeholder="Full name" oninput="document.getElementById('cvName').textContent=this.value||'CARDHOLDER NAME'"/></div>
+              <div class="fg"><label>EXPIRY</label><input type="text" id="cardExp" maxlength="5" placeholder="MM/YY" oninput="document.getElementById('cvExp').textContent=this.value||'MM / YY'"/></div>
+              <div class="fg"><label>CVV</label><input type="password" id="cardCvv" maxlength="3" placeholder="•••"/></div>
+            </div>
+          </div>
+          <div id="pmUpi" style="display:none" class="pm-sub">
+            <div class="fg span2"><label>UPI ID</label><input type="text" placeholder="name@upi"/></div>
+          </div>
+          <div id="pmNet" style="display:none" class="pm-sub">
+            <div class="fg span2"><label>SELECT BANK</label>
+              <select><option>SBI</option><option>HDFC</option><option>ICICI</option><option>Axis</option><option>Kotak</option></select>
+            </div>
+          </div>
+          <div id="pmCod" style="display:none" class="pm-sub">
+            <div class="cod-notice">Pay ₹49 COD handling fee. Cash collected at delivery.</div>
+          </div>
+        </div>
+      </div>
+      <!-- Right summary -->
+      <div class="pay-right-col">
+        <div class="pay-summary-box">
+          <div class="pay-block-hdr"><span class="pay-num">✓</span><h3>ORDER SUMMARY</h3></div>
+          <div id="payItemsMount"></div>
+          <div id="paySumMount"></div>
+          <button class="btn-primary full-btn" onclick="placeOrder()">🔒 PLACE ORDER</button>
+          <div class="trust-row">
+            <span>🔒 SSL</span><span>✅ AUTHENTIC</span><span>↩ RETURNS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ████ PAGE: SUCCESS ████ -->
+<main id="pg-success" class="page">
+  <div class="success-screen">
+    <div class="success-rings">
+      <div class="sr sr1"></div>
+      <div class="sr sr2"></div>
+      <div class="sr sr3"></div>
+    </div>
+    <div class="success-icon">✓</div>
+    <h1>ORDER <span class="acc">PLACED</span></h1>
+    <p>Transaction complete. Your order is being processed.</p>
+    <div class="success-id-box">
+      <span class="mono-txt">ORDER ID</span>
+      <strong id="sOrdId"></strong>
+    </div>
+    <p class="mono-txt success-eta">ETA: 2–4 BUSINESS DAYS</p>
+    <div class="success-btns">
+      <button class="btn-primary" onclick="goTrackS()">TRACK ORDER</button>
+      <button class="btn-ghost" onclick="P('home')">CONTINUE SHOPPING</button>
+    </div>
+  </div>
+</main>
+
+<!-- ████ PAGE: TRACKING ████ -->
+<main id="pg-tracking" class="page">
+  <div class="page-inner">
+    <div class="page-hdr">
+      <h1>TRACK <span class="acc">ORDER</span></h1>
+    </div>
+    <div class="track-input-row">
+      <input type="text" id="trackIn" placeholder="ENTER ORDER ID — DCPAC-2025-001"/>
+      <button class="btn-primary" onclick="trackOrder()">TRACK →</button>
+    </div>
+    <div class="track-samples">
+      <span class="mono-txt">TRY:</span>
+      <button onclick="qTrack('DCPAC-2025-001')">DCPAC-2025-001</button>
+      <button onclick="qTrack('DCPAC-2025-042')">DCPAC-2025-042</button>
+      <button onclick="qTrack('DCPAC-2025-099')">DCPAC-2025-099</button>
+    </div>
+    <div id="trackMount"></div>
+  </div>
+</main>
+
+<!-- ████ PAGE: ORDERS ████ -->
+<main id="pg-orders" class="page">
+  <div class="page-inner">
+    <div class="page-hdr"><h1>MY <span class="acc">ORDERS</span></h1></div>
+    <div id="ordersMount"></div>
+  </div>
+</main>
+
+<!-- ████ PAGE: DEALS ████ -->
+<main id="pg-deals" class="page">
+  <div class="page-inner">
+    <div class="page-hdr">
+      <h1>⚡ FLASH <span class="acc">DEALS</span></h1>
+      <p class="mono-txt">LIMITED TIME · UPDATED DAILY · GRAB BEFORE THEY'RE GONE</p>
+    </div>
+    <div class="prod-grid" id="dealsGrid"></div>
+  </div>
+</main>
+
+<!-- ████ PAGE: AUTH ████ -->
+<main id="pg-auth" class="page">
+  <div class="auth-scene">
+    <div class="auth-bg-lines"></div>
+    <div class="auth-card">
+      <div class="auth-card-hdr">
+        <div class="logo-mark sm">DC</div>
+        <div>
+          <div class="auth-brand">DCPAC</div>
+          <div class="mono-txt" id="authMode">SIGN IN</div>
+        </div>
+      </div>
+      <p class="auth-toggle-txt">
+        <span id="authToggleLabel">New here?</span>
+        <button onclick="toggleAuth()" id="authToggleBtn">Create account</button>
+      </p>
+      <div id="nameFieldWrap" style="display:none">
+        <div class="fg"><label>FULL NAME</label><input type="text" id="regName" placeholder="Your full name"/></div>
+      </div>
+      <div class="fg"><label>EMAIL</label><input type="email" id="authEmail" placeholder="you@email.com"/></div>
+      <div class="fg"><label>PASSWORD</label><input type="password" id="authPass" placeholder="Min 6 characters"/></div>
+      <button class="btn-primary full-btn" onclick="submitAuth()" id="authSubmit">SIGN IN</button>
+      <div class="auth-demo-hint">
+        <span class="mono-txt">DEMO:</span> demo@dcpac.com / demo123
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Quick View Modal -->
+<div class="qv-overlay" id="qvOverlay" onclick="closeQV(event)">
+  <div class="qv-panel" id="qvPanel"></div>
+</div>
+
+<script src="dcpac-app.js"></script>
+</body>
+</html>
